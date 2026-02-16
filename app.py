@@ -1,49 +1,57 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import pickle
+import json
+import numpy as np
 
-# -----------------------------------------
-# OOPS Class for Model Loading and Prediction
-# -----------------------------------------
-class MLModel:
-    def __init__(self, model_path):
-        self.model = pickle.load(open(model_path, 'rb'))
-
-    def predict(self, lst):
-        return self.model.predict([lst])[0]
-
-
-# -----------------------------------------
-# Flask App
-# -----------------------------------------
 app = Flask(__name__)
 
 # Load models
-knn_model = MLModel("knn.pkl")
-nb_model = MLModel("naive_bayes.pkl")
+knn = pickle.load(open("knn.pkl", "rb"))
+nb = pickle.load(open("naive_bayes.pkl", "rb"))
 
+# Load JSON metrics
+knn_train = json.load(open("knn_train.json", "r"))
+knn_test  = json.load(open("knn_test.json", "r"))
 
-@app.route('/')
+nb_train = json.load(open("nb_train.json", "r"))
+nb_test  = json.load(open("nb_test.json", "r"))
+
+@app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template("index.html")
 
-
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["POST"])
 def predict():
-    sepal_length = float(request.form['sl'])
-    sepal_width = float(request.form['sw'])
-    petal_length = float(request.form['pl'])
-    petal_width = float(request.form['pw'])
-    model_choice = request.form['model']
 
-    features = [sepal_length, sepal_width, petal_length, petal_width]
+    sl = float(request.form["sl"])
+    sw = float(request.form["sw"])
+    pl = float(request.form["pl"])
+    pw = float(request.form["pw"])
+    model_choice = request.form["model"]
 
-    if model_choice == "KNN":
-        result = knn_model.predict(features)
-    else:
-        result = nb_model.predict(features)
+    features = np.array([[sl, sw, pl, pw]])
 
-    return render_template('index.html', prediction=result)
+    if model_choice == "knn":
+        pred = knn.predict(features)[0]
+        metrics = {
+            "train": knn_train,
+            "test": knn_test
+        }
 
+    elif model_choice == "nb":
+        pred = nb.predict(features)[0]
+        metrics = {
+            "train": nb_train,
+            "test": nb_test
+        }
 
-if __name__ == '__main__':
+    return render_template("index.html",
+                           prediction=pred,
+                           metrics=json.dumps(metrics, indent=4))
+
+if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+    
