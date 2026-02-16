@@ -1,38 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Iris Prediction</title>
+    <title>Iris Data Classification</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 70%;
+            margin: auto;
+            margin-top: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+        .title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        .model-buttons {
+            margin-top: 15px;
+        }
+        .model-buttons input {
+            margin-right: 10px;
+        }
+        #predict {
+            margin-top: 20px;
+            background: orange;
+            padding: 10px 20px;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #result-box {
+            margin-top: 25px;
+            padding: 15px;
+            background: #e8e8e8;
+            border-radius: 10px;
+        }
+    </style>
 </head>
+
 <body>
 
-    <h2>Iris Flower Prediction</h2>
+<div class="container">
 
-    <form action="/predict" method="post">
-        <label>Sepal Length:</label>
-        <input type="text" name="sl" required><br><br>
+    <div class="title">Project – Iris Data Classification</div>
 
-        <label>Sepal Width:</label>
-        <input type="text" name="sw" required><br><br>
+    <form action="/predict" method="POST">
 
-        <label>Petal Length:</label>
-        <input type="text" name="pl" required><br><br>
+        <div class="input-group">
+            <label>Sepal Length</label>
+            <input type="number" name="sl" step="0.1" required>
+        </div>
 
-        <label>Petal Width:</label>
-        <input type="text" name="pw" required><br><br>
+        <div class="input-group">
+            <label>Sepal Width</label>
+            <input type="number" name="sw" step="0.1" required>
+        </div>
 
-        <label>Select Model:</label>
-        <select name="model" required>
-            <option value="KNN">KNN</option>
-            <option value="NB">Naive Bayes</option>
-        </select>
-        <br><br>
+        <div class="input-group">
+            <label>Petal Length</label>
+            <input type="number" name="pl" step="0.1" required>
+        </div>
 
-        <button type="submit">Predict</button>
+        <div class="input-group">
+            <label>Petal Width</label>
+            <input type="number" name="pw" step="0.1" required>
+        </div>
+
+        <div class="model-buttons">
+            <label><input type="radio" name="model" value="knn" required> KNN</label>
+            <label><input type="radio" name="model" value="nb" required> Naive Bayes</label>
+        </div>
+
+        <button id="predict" type="submit">Predict</button>
+
     </form>
 
     {% if prediction %}
-    <h3>Prediction: {{ prediction }}</h3>
+    <div id="result-box">
+        <h3>Prediction: {{ prediction }}</h3>
+
+        <pre>{{ metrics }}</pre>
+    </div>
     {% endif %}
 
+</div>
 </body>
 </html>
